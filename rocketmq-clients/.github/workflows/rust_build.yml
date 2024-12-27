@@ -1,0 +1,105 @@
+name: Rust Build
+on:
+  workflow_call:
+jobs:
+  fmt:
+    name: code style check    
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./rust
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+      - name: Code format check
+        run: cargo fmt --check
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./rust    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+      # Run clippy
+      - name: clippy check
+        run: cargo clippy --all-features -- -D warnings
+  doc:
+    name: doc check    
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./rust    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - name: Build doc
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: --cfg docsrs
+  msrv:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./rust
+    strategy:
+      matrix:
+        msrv: [1.70.0]
+    name: MSRV ${{ matrix.msrv }} check
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install cargo-msrv
+        run: |
+          cargo install cargo-msrv
+          cargo msrv --min ${{ matrix.msrv }}
+  build:
+    name: "${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    needs: [fmt, msrv]
+    defaults:
+      run:
+        working-directory: ./rust
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-12, windows-2022]
+        msrv: [1.70]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.msrv }}
+          components: clippy
+      - name: Install protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: "3.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        env:
+          BUILD_PROTO: true
+        run: rm src/pb/*.rs && cargo build
+      - name: Unit Test
+        run: cargo test -- --nocapture

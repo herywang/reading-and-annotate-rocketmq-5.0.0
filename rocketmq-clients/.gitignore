@@ -1,0 +1,56 @@
+# Intellij IDEA
+.idea/
+.run/
+out/
+*.ipr
+*.iml
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+.factorypath
+
+# MacOS
+**/.DS_Store
+
+# Visual Studio Code
+.vscode/
+
+# Maven
+target/
+*.ser
+*.ec
+dependency-reduced-pom.xml
+.flattened-pom.xml
+
+# C# 
+obj/
+csharp/examples/bin/
+csharp/rocketmq-client-csharp/bin/
+csharp/tests/bin/
+csharp/rocketmq-client.sln.DotSettings.user
+
+# Rust
+rust/target
+rust/Cargo.lock
+
+# PHP
+composer.phar
+composer.lock
+vendor/
+
+# Go
+golang/*.tests
+golang/*.test
+golang/*.exe
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+python/myvenv/
+python/__pycache__/
+python/dist
