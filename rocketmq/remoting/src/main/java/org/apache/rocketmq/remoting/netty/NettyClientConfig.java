@@ -16,6 +16,10 @@
  */
 package org.apache.rocketmq.remoting.netty;
 
+import org.apache.rocketmq.remoting.common.TlsMode;
+
+import static org.apache.rocketmq.remoting.netty.TlsSystemConfig.TLS_ENABLE;
+
 public class NettyClientConfig {
     /**
      * Worker thread number
@@ -26,6 +30,8 @@ public class NettyClientConfig {
     private int clientAsyncSemaphoreValue = NettySystemConfig.CLIENT_ASYNC_SEMAPHORE_VALUE;
     private int connectTimeoutMillis = NettySystemConfig.connectTimeoutMillis;
     private long channelNotActiveInterval = 1000 * 60;
+
+    private boolean isScanAvailableNameSrv = true;
 
     /**
      * IdleStateEvent will be triggered when neither read nor write was performed for
@@ -38,13 +44,22 @@ public class NettyClientConfig {
     private boolean clientPooledByteBufAllocatorEnable = false;
     private boolean clientCloseSocketIfTimeout = NettySystemConfig.clientCloseSocketIfTimeout;
 
-    private boolean useTLS;
+    private boolean useTLS = Boolean.parseBoolean(System.getProperty(TLS_ENABLE,
+        String.valueOf(TlsSystemConfig.tlsMode == TlsMode.ENFORCING)));
+
+    private String socksProxyConfig = "{}";
 
     private int writeBufferHighWaterMark = NettySystemConfig.writeBufferHighWaterMark;
     private int writeBufferLowWaterMark = NettySystemConfig.writeBufferLowWaterMark;
 
     private boolean disableCallbackExecutor = false;
     private boolean disableNettyWorkerGroup = false;
+
+    private long maxReconnectIntervalTimeSeconds = 60;
+
+    private boolean enableReconnectForGoAway = true;
+
+    private boolean enableTransparentRetry = true;
 
     public boolean isClientCloseSocketIfTimeout() {
         return clientCloseSocketIfTimeout;
@@ -172,5 +187,45 @@ public class NettyClientConfig {
 
     public void setDisableNettyWorkerGroup(boolean disableNettyWorkerGroup) {
         this.disableNettyWorkerGroup = disableNettyWorkerGroup;
+    }
+
+    public long getMaxReconnectIntervalTimeSeconds() {
+        return maxReconnectIntervalTimeSeconds;
+    }
+
+    public void setMaxReconnectIntervalTimeSeconds(long maxReconnectIntervalTimeSeconds) {
+        this.maxReconnectIntervalTimeSeconds = maxReconnectIntervalTimeSeconds;
+    }
+
+    public boolean isEnableReconnectForGoAway() {
+        return enableReconnectForGoAway;
+    }
+
+    public void setEnableReconnectForGoAway(boolean enableReconnectForGoAway) {
+        this.enableReconnectForGoAway = enableReconnectForGoAway;
+    }
+
+    public boolean isEnableTransparentRetry() {
+        return enableTransparentRetry;
+    }
+
+    public void setEnableTransparentRetry(boolean enableTransparentRetry) {
+        this.enableTransparentRetry = enableTransparentRetry;
+    }
+
+    public String getSocksProxyConfig() {
+        return socksProxyConfig;
+    }
+
+    public void setSocksProxyConfig(String socksProxyConfig) {
+        this.socksProxyConfig = socksProxyConfig;
+    }
+
+    public boolean isScanAvailableNameSrv() {
+        return isScanAvailableNameSrv;
+    }
+
+    public void setScanAvailableNameSrv(boolean scanAvailableNameSrv) {
+        this.isScanAvailableNameSrv = scanAvailableNameSrv;
     }
 }
