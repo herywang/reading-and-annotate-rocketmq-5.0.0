@@ -311,6 +311,7 @@ public class MQClientInstance {
                     // Start request-response channel
                     this.mQClientAPIImpl.start();
                     // Start various schedule tasks
+                    // 定时任务，定时更新nameSrv地址
                     this.startScheduledTask();
                     // Start pull service
                     this.pullMessageService.start();
@@ -763,6 +764,10 @@ public class MQClientInstance {
         return true;
     }
 
+    /**
+     * 获取topic的路由信息
+     * @param topic
+     */
     public boolean updateTopicRouteInfoFromNameServer(final String topic, boolean isDefault,
         DefaultMQProducer defaultMQProducer) {
         try {
@@ -770,6 +775,7 @@ public class MQClientInstance {
                 try {
                     TopicRouteData topicRouteData;
                     if (isDefault && defaultMQProducer != null) {
+                        // 从name server获取topic的路由信息
                         topicRouteData = this.mQClientAPIImpl.getDefaultTopicRouteInfoFromNameServer(clientConfig.getMqClientApiTimeout());
                         if (topicRouteData != null) {
                             for (QueueData data : topicRouteData.getQueueDatas()) {

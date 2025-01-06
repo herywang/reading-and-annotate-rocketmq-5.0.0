@@ -128,7 +128,10 @@ public class PullMessageService extends ServiceThread {
 
         while (!this.isStopped()) {
             try {
+                // 从message请求队列中，弹出请求。take是阻塞方法
                 MessageRequest messageRequest = this.messageRequestQueue.take();
+                // 提供两种message消费方式：pull 显式拉取，需要consumer发送ack确认才认定消息消费成功
+                // pop 模式消息弹出即消费完成，无需提交消费进度， 从rocketMQ 5.x开始支持
                 if (messageRequest.getMessageRequestMode() == MessageRequestMode.POP) {
                     this.popMessage((PopRequest) messageRequest);
                 } else {

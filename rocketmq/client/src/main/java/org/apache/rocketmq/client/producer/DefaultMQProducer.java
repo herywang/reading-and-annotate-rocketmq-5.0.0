@@ -165,12 +165,14 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     /**
      * on BackpressureForAsyncMode, limit maximum number of on-going sending async messages
      * default is 10000
+     * 正在发送中的消息数量限制，默认10000. 最少不得小于10个
      */
     private int backPressureForAsyncSendNum = 10000;
 
     /**
      * on BackpressureForAsyncMode, limit maximum message size of on-going sending async messages
      * default is 100M
+     * 发送中的消息大小限制，默认100MB，最小不得小于1MB
      */
     private int backPressureForAsyncSendSize = 100 * 1024 * 1024;
 
@@ -292,7 +294,9 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
         this.topics = topics;
         this.enableTrace = enableMsgTrace;
         this.traceTopic = customizedTraceTopic;
+        // 初始化默认的mq producer实现类
         defaultMQProducerImpl = new DefaultMQProducerImpl(this, rpcHook);
+        // 初始化produce消息累加器，
         produceAccumulator = MQClientManager.getInstance().getOrCreateProduceAccumulator(this);
     }
 
@@ -354,6 +358,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     @Override
     public void start() throws MQClientException {
         this.setProducerGroup(withNamespace(this.producerGroup));
+        // 启动producer实现类
         this.defaultMQProducerImpl.start();
         if (this.produceAccumulator != null) {
             this.produceAccumulator.start();

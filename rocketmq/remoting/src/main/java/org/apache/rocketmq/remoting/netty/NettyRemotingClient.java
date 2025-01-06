@@ -184,6 +184,9 @@ public class NettyRemotingClient extends NettyRemotingAbstract implements Remoti
         }
     }
 
+    /**
+     * 启动netty客户端
+     */
     @Override
     public void start() {
         if (this.defaultEventExecutorGroup == null) {
